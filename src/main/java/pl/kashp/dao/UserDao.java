@@ -13,6 +13,7 @@ public class UserDao {
     private static final String CREATE_USER_QUERY = "INSERT INTO users(username, email, password) VALUES (?, ?, ?)";
     private static final String UPDATE_USER_QUERY = "UPDATE users SET username = ?, email = ?, password = ? WHERE id = ?;";
     private static final String READ_USER_QUERY = "SELECT * FROM users WHERE id = '%s'";
+    private static final String READALL_USER_QUERY = "SELECT * FROM users";
 
     public User create(User user) {
         try (Connection conn = DBUtils.connect(DB_NAME)) {
@@ -35,7 +36,7 @@ public class UserDao {
     }
 
     public User read(int userId) throws SQLException {
-            String input = String.format(READ_USER_QUERY, userId);
+        String input = String.format(READ_USER_QUERY, userId);
         try (Connection conn = DBUtils.connect(DB_NAME)) {
             ArrayList<String> list = DBUtils.parseIntoUser(conn, input, "id", "email", "username", "password");
             return new User(Integer.parseInt(list.get(0)), list.get(1), list.get(2), list.get(3));
@@ -64,8 +65,25 @@ public class UserDao {
         }
     }
 
+    public ArrayList<User> findAll() throws SQLException {
+        ArrayList<User> users = new ArrayList<>();
+        try (Connection conn = DBUtils.connect(DB_NAME)) {
+            var list = DBUtils.parseIntoUser(conn, READALL_USER_QUERY, "id", "username", "email", "password");
+            int userParamCounter = list.size();
+            for (int i = 0; i < userParamCounter; i += 4) {
+                int id = Integer.parseInt(list.get(i));
+                String name = list.get(i + 1);
+                String email = list.get(i + 2);
+                String password = list.get(i + 3);
+                users.add(new User(id, name, email, password));
+            }
+        }
+        return users;
+    }
+
     private String hashPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 
 }
+
