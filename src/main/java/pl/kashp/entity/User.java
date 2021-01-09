@@ -1,17 +1,27 @@
-package pl.kashp;
+package pl.kashp.entity;
 
 public class User {
 
+    private int id;
     private String email;
     private String username;
     private String password;
 
     public User(){};
 
-    public User(String email, String username, String password) {
+    public User(int id, String email, String username, String password) {
+        this.id = id;
         this.email = email;
         this.username = username;
         this.password = password;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getEmail() {
@@ -36,5 +46,10 @@ public class User {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("User: %s, %s, %s", id, username, email);
     }
 }
